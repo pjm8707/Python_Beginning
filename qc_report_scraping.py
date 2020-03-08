@@ -11,6 +11,7 @@ Created on Sun Mar  1 20:35:18 2020
 import sys
 import os
 import logging
+import re
 
 #검색할 web page 양이 많으면 파일로 떨구고, 아래 처럼 파일로 넘겨주
 #with open("index.html") as fp:
@@ -71,6 +72,50 @@ def GetLogInfoFromhtml_td(html_data, th_data) :
             idx+=1
     return td_data
 
+def GetDataFromFile(f_path, f_mode='r', f_encoding='utf-8') :
+    with open(f_path, mode=f_mode, encoding=f_encoding) as file :
+        return file.readlines()
+
+def ParseLogData(text_data) :
+    idx=0
+    fail_cnt=0
+    data=list()
+    check_idx=-1
+    check_md5=[0,0]
+    for line in text_data :
+        if re.search('^\[[0-9]+\/[0-9]+\]', line) : #first
+            check_idx=idx
+            check_md5[0]=0
+            check_md5[1]=15
+            data.append(line)
+            idx+=1
+            #print(data[idx-1], end="")
+
+        if check_idx == (idx-1) :
+            if re.search('^\[RESULT\] SUCCESS', line) :
+                del data[idx-1]
+                idx-=1
+            elif re.search('^\[RESULT\] FAILURE', line) :
+                check_idx+=1
+                data[idx-1] = data[idx-1] + line
+                fail_cnt+=1
+            elif re.search('^Unix   :', line):
+                data[idx-1] = data[idx-1] + line
+            elif re.search('^\[ERROR\]MISMATCH WITH GOLDEN MD5', line):
+                check_md5[0]=1
+            elif re.search('^ INSNTANCE #0 INTERRUPT TIMEOUT.', line):
+                data[idx-1] = data[idx-1] + line
+
+            if 1 == check_md5[0] and 0 < check_md5[1] :
+                data[idx-1] = data[idx-1] + line
+                check_md5[1]-=1
+
+    return data, fail_cnt
+
+#text_data = GetDataFromFile('test_log_20200308.txt')
+#extracted_data, fail_cnt = ParseLogData(text_data)
+#for log in extracted_data :
+#    print(log, end='')
 
 if __name__ == "__main__":
     try:
