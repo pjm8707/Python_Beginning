@@ -33,10 +33,10 @@ def DLOG(*args):
     debugLogger.debug(msg_str)
 
 LOG_URL="http://wiki.chipsnmedia.com:8080/"
-URL="http://wiki.chipsnmedia.com:8080/display/IRONDOM/2020-01-15_15-13-47_W517_goke_simple_check_X"
+URL="http://wiki.chipsnmedia.com:8080/pages/viewpage.action?pageId=147763151"
 LOGIN_DATA = {
-    'os_username': 'xxx',
-    'os_password': 'xxx'
+    'os_username': 'ian.park',
+    'os_password': '@yangjaemin2'
 }
 
 class Web_scraping:
@@ -44,11 +44,15 @@ class Web_scraping:
         print("Web scraping class")
 
 
-def GetLogInfoFromhtml_th(html_data) :
+def GetLogInfoFromhtml_th(html_data, header_cnt) :
+    idx=0
     th_data = []
     b_soup = BeautifulSoup(html_data, 'html.parser')
-    for tag in b_soup.select('th[class="confluenceTh tablesorter-header sortableHeader"]') :
+    for tag in b_soup.select('th[class="confluenceTh"]') : 
         th_data.append(tag.p.text.strip())
+        idx+=1
+        if (header_cnt == idx):
+            break
 
     return th_data
 
@@ -61,9 +65,9 @@ def GetLogInfoFromhtml_td(html_data, th_data) :
         #td_data.append(tag.p.text.strip())
         if 0 == idx :
             td_dic = dict()
-        print('index : ', idx, 'th_data : ', th_data[idx])
-        td_dic[th_data[idx]] =tag.p.text.strip()
-        if ('FULL LOG' == tag.p.text.strip()):
+        #print('index : ', idx, 'th_data : ', th_data[idx])
+        td_dic[th_data[idx]] =tag.p.text.strip()        
+        if ('Plain Short Full' == tag.p.text.strip()):
             td_dic[th_data[idx]] = tag.p.a.get('href')
         if (length-2 == idx) :
             td_data.append(td_dic)
@@ -112,6 +116,11 @@ def ParseLogData(text_data) :
 
     return data, fail_cnt
 
+def OpenFile(fpath, fmode, fencoding='utf-8') :
+    with open(fpath, mode=fmode, encoding=fencoding) as f :
+        return f
+        
+
 #text_data = GetDataFromFile('test_log_20200308.txt')
 #extracted_data, fail_cnt = ParseLogData(text_data)
 #for log in extracted_data :
@@ -133,7 +142,77 @@ if __name__ == "__main__":
 
     req_html= res.text
 
-    print(req_html)
+    #print(req_html)
     
-    th_data = GetLogInfoFromhtml_th(req_html)
+    th_data = GetLogInfoFromhtml_th(req_html, 13)
     td_data = GetLogInfoFromhtml_td(req_html, th_data)
+    print('len :',len(td_data))
+    
+    log_url = []
+    for data in td_data :
+        print(data['STREAMS'], ': ', data['JENKINS'])
+        log_url.append(data['JENKINS'])
+
+    print('log url : ', log_url[0].replace(' ',''))
+    
+    res=s.get(log_url[6].replace(' ',''))
+    #res=s.get('http://ci.chipsnmedia.com/job/WAVE517_DEC_qc/26006/consoleText')
+    #print(res.text)
+    
+    #f_log = OpenFile('test.log', 'w')
+    #f_log.write(res.text)
+    f_log= open('test.log', 'w')
+    f_log.write(res.text)
+    f_log.close()
+    
+    f_log = open('test.log', 'r')
+    text = f_log.readlines()
+    
+    fail_data, fail_cnt = ParseLogData(text)
+    print('fail cnt : ', fail_cnt)
+    for f_data in fail_data :
+        print(f_data, end='')
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
