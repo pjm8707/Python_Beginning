@@ -12,14 +12,14 @@ import sys
 import os
 import logging
 import re
-
-#검색할 web page 양이 많으면 파일로 떨구고, 아래 처럼 파일로 넘겨주
-#with open("index.html") as fp:
-#    soup = BeautifulSoup(fp)
+from datetime import datetime
 
 #for web scraping
 import requests
 from bs4 import BeautifulSoup
+
+#for contral excel
+from openpyxl import Workbook
 
 formatter = '%(asctime)-15s:%(module)s:%(lineno)d:%(message)s'
 logging.basicConfig(stream=sys.stderr, format=formatter, level=logging.DEBUG)
@@ -116,15 +116,35 @@ def ParseLogData(text_data) :
 
     return data, fail_cnt
 
-def OpenFile(fpath, fmode, fencoding='utf-8') :
+def WriteFileFromTxt(text, fpath, fmode, fencoding='utf-8') :
     with open(fpath, mode=fmode, encoding=fencoding) as f :
-        return f
-        
+        f.write(text)
 
+def ReadFileLines(fpath, fmode, fencoding='utf-8'):
+    with open(fpath, mode=fmode, encoding=fencoding) as f :
+        text = f.readlines()
+        return text
 #text_data = GetDataFromFile('test_log_20200308.txt')
 #extracted_data, fail_cnt = ParseLogData(text_data)
 #for log in extracted_data :
 #    print(log, end='')
+        
+def MakeLogFile(idx, text) :
+    file_name = 'test_log_' + str(idx)
+    with open(file_name, mode='w', encoding='utf-8') as f :
+        f.write(text)
+        
+def ReadLogFile(idx) :
+    file_name = 'test_log_' + str(idx)
+    with open(file_name, mode='r', encoding='utf-8') as f :
+        text = f.readlines()
+    return text
+
+def MakeExcelData(workbook, sheet_name, data) :
+    work_sheet= workbook.create_sheet(sheet_name)
+    for line_log in data :
+        work_sheet.append([line_log])
+    
 
 if __name__ == "__main__":
     try:
@@ -155,23 +175,44 @@ if __name__ == "__main__":
 
     print('log url : ', log_url[0].replace(' ',''))
     
-    res=s.get(log_url[6].replace(' ',''))
+    idx = 0
+    print('len :',len(log_url))
+    for url in log_url :
+        print("log url :" , url, " idx : ", idx)
+        res = s.get(url.replace(' ',''))
+        MakeLogFile(idx, res.text)
+        idx+=1
+    
+    #res=s.get(log_url[6].replace(' ',''))
     #res=s.get('http://ci.chipsnmedia.com/job/WAVE517_DEC_qc/26006/consoleText')
     #print(res.text)
     
     #f_log = OpenFile('test.log', 'w')
     #f_log.write(res.text)
-    f_log= open('test.log', 'w')
-    f_log.write(res.text)
-    f_log.close()
+    #f_log= open('test.log', 'w')
+    #f_log.write(res.text)
+    #f_log.close()
     
-    f_log = open('test.log', 'r')
-    text = f_log.readlines()
+    #f_log = open('test.log', 'r')
+    #text = f_log.readlines()
     
-    fail_data, fail_cnt = ParseLogData(text)
-    print('fail cnt : ', fail_cnt)
-    for f_data in fail_data :
-        print(f_data, end='')
+    workbook = Workbook() # excel file
+    #datetime.today().strftime("%Y_%m_%d_%H_%M%S")
+    time_data = datetime.today().strftime("%Y_%m_%d_%H_%M")
+    excel_file_name="test" + time_data + ".xlsx"
+    
+    idx=0
+    for data in td_data :
+        text = ReadLogFile(idx)
+        fail_data, fail_cnt = ParseLogData(text)
+        MakeExcelData(workbook, data['STREAMS'], fail_data)
+        idx+=1
+    
+    workbook.save(excel_file_name)
+#    fail_data, fail_cnt = ParseLogData(text)
+#    print('fail cnt : ', fail_cnt)
+#    for f_data in fail_data :
+#        print(f_data, end='')
         
         
     
