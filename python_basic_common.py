@@ -37,9 +37,13 @@ range_x = range(10)
 print("type:", type(range_x))
 print("length :", len(range_x))
 
+for val in range_x:
+    print("val:", val)
+
 #dictionary
 empty_dict1 = {}
 empty_dict2 = dict()
+list_grades = {80, 95}
 grades = {"Joel" : 80, "Tim" : 95}
 
 print(grades['Joel'])
@@ -48,12 +52,16 @@ tweet = {
         "user" : "jay",
         "text" : "I am a nice guy",
         "retweet_count" : 100,
-        "hashtags" : ["#excercise", "#crossfit", "#yolo", "#500F"]
+        "hashtags" : ["#excercise", "#crossfit", "#yolo", "#500F"],
+        "list_grade" : list_grades
         }
 
 tweet_keys = tweet.keys() # key list
 tweet_valus = tweet.values() # value list
 tweet_items = tweet.items() # key + value list
+
+for val in tweet['list_grade']:
+    print("val : {}".format(val))
 
 #my sql
 HOST_DB_ADDR='52.2.12.152'
