@@ -20,6 +20,14 @@ import pymysql
 # panda sql , pip install -U pandasql
 from pandasql import sqldf
 
+import os, sys, re
+
+#function
+def test_func() :
+    test_func.idx += 1
+    return test_func.idx
+
+test_func.idx = 0
 
 #string formating python v3.~
 test_str = 'Hi, {}'.format('Ian')
@@ -62,6 +70,42 @@ tweet_items = tweet.items() # key + value list
 
 for val in tweet['list_grade']:
     print("val : {}".format(val))
+
+
+xxx_8b_list=[
+    "test_xxx_list_1",
+    "test_xxx_list_2",
+    "test_xxx_list_3",
+]
+
+DIC_STREAM_LIST = {
+    "xxx"    : [ "xxx_list", xxx_8b_list],
+}
+
+#os (import os)
+cmd="pwd"
+os.system(cmd)
+
+#file open/close
+rfile_path = r'D:\199_TEMP\temp_file_20190703\r_test_doc.txt'
+wfile_path = r'D:\199_TEMP\temp_file_20190703\w_test_doc.txt'
+rfile_path.replace('\\', '/')
+wfile_path.replace('\\', '/')
+
+#mode = 'r+b'
+with open(rfile_path , mode = 'rt+', encoding = 'utf-8') as file :
+    for line in file:
+        print(line)
+
+with (open(rfile_path, mode = 'rt+', encoding = 'utf-8')) as rFile :
+    with (open(wfile_path, mode = 'wt+', encoding = 'utf-8')) as wFile:
+        for line in rFile:
+            wFile.write(line)
+
+#re
+pattern='picture_num : [0-9]+'
+res = re.search(pattern, line)
+last_display_res_group = res.group()
 
 #my sql
 HOST_DB_ADDR='52.2.12.152'
