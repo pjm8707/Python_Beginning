@@ -92,8 +92,8 @@ wfile_path = r'D:\199_TEMP\temp_file_20190703\w_test_doc.txt'
 rfile_path.replace('\\', '/')
 wfile_path.replace('\\', '/')
 
-#mode = 'r+b'
-with open(rfile_path , mode = 'rt+', encoding = 'utf-8') as file :
+#mode = 'r+b', 'a', 'a+'
+with open(rfile_path , mode = 'rt', encoding = 'utf-8') as file :
     for line in file:
         print(line)
 
@@ -102,10 +102,13 @@ with (open(rfile_path, mode = 'rt+', encoding = 'utf-8')) as rFile :
         for line in rFile:
             wFile.write(line)
 
-#re
+#regular expression
 pattern='picture_num : [0-9]+'
 res = re.search(pattern, line)
-last_display_res_group = res.group()
+res_group = res.group()
+
+if re.search(pattern, line) != None:
+    print('found')
 
 #my sql
 HOST_DB_ADDR='52.2.12.152'
